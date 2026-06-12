@@ -1,0 +1,408 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Job Application Form",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "LinkedIn Profile"
+            },
+            {
+              "fieldLabel": "Resume",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "04df3ab1-9fea-43c3-9596-6f8cf66deb9a",
+      "name": "On form submission",
+      "webhookId": "81e66845-7ddb-467b-add9-435707684843"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Resume",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4803fa72-a38e-4670-ad1a-fb4ef0201c0c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Rule 1: Do not exceed maximum of 75 words. As an AI  with advanced capabilities in talent acquisition, analyze a candidate's resume against a job description. Output must be in ${output_language). Structure: 1. Compatibility Rating: Score 1-10 with rationale. 2. ATS Score: Realistic number out of 100 such as 43, 76, 89, reflecting keyword and skills alignment. 3. Recommendation: Advise if candidate should be interviewed with reasoning. Job description: \"Software Engineer\" at Atomise Al Resume: ${resume}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        416,
+        0
+      ],
+      "id": "78c78787-2277-4223-b1d3-55a4468e720c",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\n\"ats_score\": 82,\n\n\"summary\": \"Your resume is well-structured and highlights relevant experience, but could use more targeted keywords to improve ATS compatibility.\"\n\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        208
+      ],
+      "id": "2f3d1a22-2fdd-4d4b-aecd-faa59839cacb",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2b891c54-ae01-447f-886e-af82bee0d2a5",
+              "leftValue": "={{ $json.output.ats_score }}",
+              "rightValue": 70,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        0
+      ],
+      "id": "3e2afec9-3202-463b-8311-0e0fe11d7e3a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Z8GYHtHLmTZyMsqx467btweEBT4mp1WEBap8GMYWMik",
+          "mode": "list",
+          "cachedResultName": "Shortlisted ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Z8GYHtHLmTZyMsqx467btweEBT4mp1WEBap8GMYWMik/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Z8GYHtHLmTZyMsqx467btweEBT4mp1WEBap8GMYWMik/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $('On form submission').item.json['Full Name'] }}",
+            "E-mail": "={{ $('On form submission').item.json.Email }}",
+            "CV": "={{ $('On form submission').item.json.Resume[0].filename }}",
+            "Linkedin": "={{ $('On form submission').item.json['LinkedIn Profile'] }}",
+            "ATS Score": "={{ $('Basic LLM Chain').item.json.output.ats_score }}",
+            "Summary": "={{ $('Basic LLM Chain').item.json.output.summary }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "CV",
+              "displayName": "CV",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "E-mail",
+              "displayName": "E-mail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS Score",
+              "displayName": "ATS Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        80
+      ],
+      "id": "3788c833-cb0b-4f91-9f62-71d2daee0aba",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RzmyjakS7yEDDOvD",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        208
+      ],
+      "id": "6892aaad-4391-489d-8c67-725331076327",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "SQHiZrd0ZpE55yv7",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sailikith529591@gmail.com",
+        "subject": "=New Candidate Application Received",
+        "message": "=Hello HR, A new CV has been successfully received in our system. Please review the candidate's details at your earliest convenience.  Candidate Name: {{ $('On form submission').item.json['Full Name'] }} Candidate E-mail:{{ $('On form submission').item.json.Email }} Candidate Linkedin: {{ $('On form submission').item.json['LinkedIn Profile'] }} Candidate AI Rating: {{ $('Basic LLM Chain').item.json.output.ats_score }}  Thank you for your attention. Best regards, Automated CV Screening",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1152,
+        80
+      ],
+      "id": "7ec3a099-4570-4f4a-a8f5-f90bada85508",
+      "name": "Send a message",
+      "webhookId": "16562e74-d926-4b20-90a5-10715689aa32",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WxBazj9LOC24yUsd",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Application Received - We're reviewing your CV",
+        "message": "=Dear {{ $('On form submission').item.json[\"Full Name\"] }},\n\nThank you for submitting your application and uploading your CV. We have successfully received your details and our team will review your profile shortly. \nIf your experience aligns with our current requirements, we will get back to you soon to discuss the next steps.\n\nBest regards,\n[WintAI]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        80
+      ],
+      "id": "aa682dd9-ac90-47d1-8174-1678a7b332f7",
+      "name": "Send a message1",
+      "webhookId": "1ec8507a-aaea-4c6a-8146-b3bd2d16a015",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WxBazj9LOC24yUsd",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "100e9e03-d1e9-49e4-b905-afb821860946",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bf788c1fa73219afccc42ac7dc37790f311f8a5666ed44c2c9595ad345d86c20"
+  },
+  "nodeGroups": [],
+  "id": "ErzkOwaipyljMFiW",
+  "tags": []
+}
