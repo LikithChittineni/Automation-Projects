@@ -4,15 +4,15 @@ Overview
 This workflow automates the initial candidate screening process using AI. 
 Applicants submit their details and resume through a web form, the resume is analyzed by an LLM, and qualified candidates are automatically shortlisted, recorded in Google Sheets, and notified via email.
 
-Features
-📄 Resume upload and PDF text extraction
-🤖 AI-powered resume analysis using OpenAI GPT-4.1 Mini
-📊 ATS compatibility scoring (0-100)
-⭐ Candidate suitability rating and summary generation
-✅ Automatic shortlisting based on ATS score threshold
-📑 Candidate data storage in Google Sheets
-📧 HR notification emails
-📨 Automated confirmation emails to applicants
+##Features
+-📄 Resume upload and PDF text extraction
+-🤖 AI-powered resume analysis using OpenAI GPT-4.1 Mini
+-📊 ATS compatibility scoring (0-100)
+-⭐ Candidate suitability rating and summary generation
+-✅ Automatic shortlisting based on ATS score threshold
+-📑 Candidate data storage in Google Sheets
+-📧 HR notification emails
+-📨 Automated confirmation emails to applicants
 
 Candidate Form Submission
             │
