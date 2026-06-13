@@ -1,6 +1,7 @@
-AI-Powered Resume Screening Automation (n8n)
+#AI-Powered Resume Screening Automation (n8n)
 Overview
 
+## Overview
 This workflow automates the initial candidate screening process using AI. 
 Applicants submit their details and resume through a web form, the resume is analyzed by an LLM, and qualified candidates are automatically shortlisted, recorded in Google Sheets, and notified via email.
 
