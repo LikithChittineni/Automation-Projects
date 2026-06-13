@@ -15,6 +15,7 @@ Applicants submit their details and resume through a web form, the resume is ana
 - 📧 HR notification emails
 - 📨 Automated confirmation emails to applicants
 
+```text
 Candidate Form Submission
             │
             ▼
